@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSteamIdleConsole", "TestSteamIdleConsole\TestSteamIdleConsole.csproj", "{DF92F1F4-2D12-4423-8F6A-DAA2F3DF39F8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF92F1F4-2D12-4423-8F6A-DAA2F3DF39F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF92F1F4-2D12-4423-8F6A-DAA2F3DF39F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF92F1F4-2D12-4423-8F6A-DAA2F3DF39F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF92F1F4-2D12-4423-8F6A-DAA2F3DF39F8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6FBBAA6E-298C-4681-B268-EB82320B059D}
+	EndGlobalSection
+EndGlobal
