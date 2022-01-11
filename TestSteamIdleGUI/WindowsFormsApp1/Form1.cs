@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using System.Drawing;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace TestSteamIdleGui
@@ -42,35 +40,65 @@ namespace TestSteamIdleGui
         // apps.txt
         void LoadAppList()
         {
+            SortedDictionary<int, bool> apps = new SortedDictionary<int, bool>();
+
             foreach (string line in File.ReadLines(pathTxt))
             {
                 List<string> data = line.Split(',').ToList();
                 if (data.Count > 0)
-                    AppList.Items.Add(data[0], bool.Parse(data[1]));
+                    apps.Add(int.Parse(data[0]), bool.Parse(data[1]));
+            }
+
+            foreach (KeyValuePair<int, bool> kvp in apps)
+            {
+                AppInfo app = new AppInfo(kvp.Key, GetAppName(kvp.Key));
+
+                AppList.Items.Add(app, kvp.Value);
             }
 
             AppCounter.Text = "Apps: " + AppList.Items.Count;
-            idleCounter.Text = "To idle: " + AppList.CheckedItems.Count;
         }
 
         private void SaveAppList()
         {
             List<string> data = new List<string>();
 
-            for (int i=0; i < AppList.Items.Count; i++)
+            for (int i = 0; i < AppList.Items.Count; i++)
             {
-                var id = int.Parse(AppList.Items[i].ToString());
+                AppInfo app = (AppInfo)AppList.Items[i];
+                OutputText("saved " + app.ToString());
+
                 bool state = AppList.GetItemChecked(i);
 
-                data.Add(id + "," + state.ToString());
+                data.Add(app.Id + "," + state.ToString());
             }
 
             System.IO.File.WriteAllLines("apps.txt", data);
-
-            AppCounter.Text = "Apps: " + AppList.Items.Count;
-            idleCounter.Text = "To idle: " + AppList.CheckedItems.Count;
         }
 
+        private static string GetAppName(int appid)
+        {
+            // Ignore exception: Can not create SSL/TLS secure channel
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            //
+
+            string name = "<unknown>";
+            string url = "https://store.steampowered.com/api/appdetails?filters=basic&appids=" + appid.ToString();
+            using (WebClient client = new WebClient())
+            {
+                string response = client.DownloadString(url);
+                try
+                {
+                    name = Regex.Match(response, ",\"name\":\"(.+?)\",").Groups[1].Value;
+                }
+                catch
+                {
+                }
+            }
+            return name;
+        }
 
         // init
         private void MainWindow_Load(object sender, EventArgs e)
@@ -104,13 +132,13 @@ namespace TestSteamIdleGui
         {
             OutputText("\nStarting Idle...");
 
-            foreach (object AppID in AppList.CheckedItems)
+            foreach (AppInfo app in AppList.CheckedItems)
             {
-                startInfo.Arguments = AppID.ToString();
-                Process.Start(startInfo);
+                //startInfo.Arguments = app.Id.ToString();
+                //Process.Start(startInfo);
 
-                OutputText("\t• Started idle process for app " + AppID.ToString());
-                PaintText(AppID.ToString(), 128, 255, 128);
+                OutputText("\t• Started idle process for app " + app.ToString());
+                PaintText(app.ToString(), 128, 255, 128);
             }
         }
 
@@ -179,24 +207,23 @@ namespace TestSteamIdleGui
             if (InputField.Text == "")
                 return;
 
-            AppList.Items.Add(InputField.Text, true);
+            AppInfo app = new AppInfo(int.Parse(InputField.Text), GetAppName(int.Parse(InputField.Text)));
+            AppList.Items.Add(app, true);
 
-            OutputText("Added app " + InputField.Text);
-
-            int index = OutputBox.Text.IndexOf(InputField.Text);
-            int lenght = InputField.Text.Length;
-
-            OutputBox.Select(index, lenght);
-            OutputBox.SelectionColor = Color.FromArgb(255, 100, 200, 100);
+            OutputText("Added app " + app.Name);
+            PaintText(app.Name, 128, 255, 128);
 
             SaveAppList();
+            AppList.Items.Clear();
+            LoadAppList();
+
             InputField.Clear();
         }
 
         // remove app button
         private void RemoveAppButton_Click(object sender, EventArgs e)
         {
-            if (AppList.SelectedItem==null)
+            if (AppList.SelectedItem == null)
                 return;
 
             AppList.Items.Remove(AppList.SelectedItem);
@@ -206,5 +233,16 @@ namespace TestSteamIdleGui
         private void AppList_SelectedIndexChanged(object sender, EventArgs e) => SaveAppList();
 
         private void ClearLogButton_Click(object sender, EventArgs e) => OutputBox.Clear();
+    }
+    public class AppInfo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public AppInfo(int id, string name = "<unknown>")
+        {
+            this.Id = id;
+            this.Name = name;
+        }
+        public override string ToString() => Name.ToString();
     }
 }

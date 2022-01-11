@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.StartButton = new System.Windows.Forms.Button();
             this.OutputBox = new System.Windows.Forms.RichTextBox();
             this.AppList = new System.Windows.Forms.CheckedListBox();
@@ -66,10 +65,12 @@
             this.OutputBox.TabIndex = 0;
             this.OutputBox.TabStop = false;
             this.OutputBox.Text = "";
+            this.OutputBox.WordWrap = false;
             // 
             // AppList
             // 
             this.AppList.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.AppList.Font = new System.Drawing.Font("Georgia", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AppList.ForeColor = System.Drawing.Color.Silver;
             this.AppList.FormattingEnabled = true;
             this.AppList.Location = new System.Drawing.Point(275, 89);
@@ -77,7 +78,6 @@
             this.AppList.Size = new System.Drawing.Size(254, 304);
             this.AppList.TabIndex = 2;
             this.AppList.TabStop = false;
-            this.AppList.SelectedIndexChanged += new System.EventHandler(this.AppList_SelectedIndexChanged);
             // 
             // StopButton
             // 
@@ -192,7 +192,6 @@
             this.Controls.Add(this.OutputBox);
             this.Controls.Add(this.StartButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.Text = "TestSteamIdle";
