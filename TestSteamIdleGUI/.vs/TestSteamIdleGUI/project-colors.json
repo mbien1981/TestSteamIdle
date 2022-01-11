@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "5ddcff17-33bf-4d99-8c75-fb13fe65b256": {
+      "ProjectGuid": "5ddcff17-33bf-4d99-8c75-fb13fe65b256",
+      "DisplayName": "TestSteamIdleGUI",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
