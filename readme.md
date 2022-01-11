@@ -12,5 +12,5 @@ You can either run "**TestSteamIdleConsole.exe**" or "**TestSteamIdleGUI.exe**" 
 # Preview
 <div style="text-align:center">
 	<img src="https://i.imgur.com/lwZ9TdR.png" />
-	<img src="https://i.imgur.com/CpZRYl5.png" />
+	<img src="https://i.imgur.com/qUzS0cA.png" />
 </div>
