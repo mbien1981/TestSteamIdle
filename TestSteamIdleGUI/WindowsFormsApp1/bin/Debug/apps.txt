@@ -1,4 +1,0 @@
-240,True
-24240,True
-218620,False
-4000,True

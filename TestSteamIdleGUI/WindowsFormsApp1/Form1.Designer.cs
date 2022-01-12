@@ -38,7 +38,8 @@
             this.AppCounter = new System.Windows.Forms.Label();
             this.ClearLogButton = new System.Windows.Forms.Button();
             this.RemoveAppButton = new System.Windows.Forms.Button();
-            this.idleCounter = new System.Windows.Forms.Label();
+            this.SetInvisibleButton = new System.Windows.Forms.Button();
+            this.SetOnlineButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // StartButton
@@ -50,7 +51,7 @@
             this.StartButton.Size = new System.Drawing.Size(256, 56);
             this.StartButton.TabIndex = 0;
             this.StartButton.TabStop = false;
-            this.StartButton.Text = "start_idle";
+            this.StartButton.Text = "Start Idle";
             this.StartButton.UseVisualStyleBackColor = true;
             this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
             // 
@@ -70,12 +71,12 @@
             // AppList
             // 
             this.AppList.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.AppList.Font = new System.Drawing.Font("Georgia", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AppList.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AppList.ForeColor = System.Drawing.Color.Silver;
             this.AppList.FormattingEnabled = true;
             this.AppList.Location = new System.Drawing.Point(275, 89);
             this.AppList.Name = "AppList";
-            this.AppList.Size = new System.Drawing.Size(254, 304);
+            this.AppList.Size = new System.Drawing.Size(254, 292);
             this.AppList.TabIndex = 2;
             this.AppList.TabStop = false;
             // 
@@ -89,7 +90,7 @@
             this.StopButton.Size = new System.Drawing.Size(254, 56);
             this.StopButton.TabIndex = 3;
             this.StopButton.TabStop = false;
-            this.StopButton.Text = "stop_idle";
+            this.StopButton.Text = "Stop Idle";
             this.StopButton.UseVisualStyleBackColor = false;
             this.StopButton.Click += new System.EventHandler(this.StopButton_Click);
             // 
@@ -109,9 +110,9 @@
             // 
             this.AddAppButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AddAppButton.ForeColor = System.Drawing.Color.Silver;
-            this.AddAppButton.Location = new System.Drawing.Point(275, 426);
+            this.AddAppButton.Location = new System.Drawing.Point(275, 425);
             this.AddAppButton.Name = "AddAppButton";
-            this.AddAppButton.Size = new System.Drawing.Size(122, 24);
+            this.AddAppButton.Size = new System.Drawing.Size(122, 25);
             this.AddAppButton.TabIndex = 5;
             this.AddAppButton.TabStop = false;
             this.AddAppButton.Text = "Add App";
@@ -142,9 +143,9 @@
             // 
             this.ClearLogButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ClearLogButton.ForeColor = System.Drawing.Color.Silver;
-            this.ClearLogButton.Location = new System.Drawing.Point(13, 426);
+            this.ClearLogButton.Location = new System.Drawing.Point(13, 425);
             this.ClearLogButton.Name = "ClearLogButton";
-            this.ClearLogButton.Size = new System.Drawing.Size(80, 24);
+            this.ClearLogButton.Size = new System.Drawing.Size(66, 25);
             this.ClearLogButton.TabIndex = 8;
             this.ClearLogButton.TabStop = false;
             this.ClearLogButton.Text = "Clear log";
@@ -155,24 +156,40 @@
             // 
             this.RemoveAppButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RemoveAppButton.ForeColor = System.Drawing.Color.Silver;
-            this.RemoveAppButton.Location = new System.Drawing.Point(407, 426);
+            this.RemoveAppButton.Location = new System.Drawing.Point(407, 425);
             this.RemoveAppButton.Name = "RemoveAppButton";
-            this.RemoveAppButton.Size = new System.Drawing.Size(122, 24);
+            this.RemoveAppButton.Size = new System.Drawing.Size(121, 25);
             this.RemoveAppButton.TabIndex = 9;
             this.RemoveAppButton.TabStop = false;
             this.RemoveAppButton.Text = "Remove App";
             this.RemoveAppButton.UseVisualStyleBackColor = true;
             this.RemoveAppButton.Click += new System.EventHandler(this.RemoveAppButton_Click);
             // 
-            // idleCounter
+            // SetInvisibleButton
             // 
-            this.idleCounter.AutoSize = true;
-            this.idleCounter.ForeColor = System.Drawing.Color.Silver;
-            this.idleCounter.Location = new System.Drawing.Point(478, 73);
-            this.idleCounter.Name = "idleCounter";
-            this.idleCounter.Size = new System.Drawing.Size(51, 13);
-            this.idleCounter.TabIndex = 10;
-            this.idleCounter.Text = "To idle: 0";
+            this.SetInvisibleButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SetInvisibleButton.ForeColor = System.Drawing.Color.Silver;
+            this.SetInvisibleButton.Location = new System.Drawing.Point(85, 425);
+            this.SetInvisibleButton.Name = "SetInvisibleButton";
+            this.SetInvisibleButton.Size = new System.Drawing.Size(112, 25);
+            this.SetInvisibleButton.TabIndex = 11;
+            this.SetInvisibleButton.TabStop = false;
+            this.SetInvisibleButton.Text = "Set Invisible";
+            this.SetInvisibleButton.UseVisualStyleBackColor = true;
+            this.SetInvisibleButton.Click += new System.EventHandler(this.SetInvisibleButton_Click);
+            // 
+            // SetOnlineButton
+            // 
+            this.SetOnlineButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SetOnlineButton.ForeColor = System.Drawing.Color.Silver;
+            this.SetOnlineButton.Location = new System.Drawing.Point(203, 425);
+            this.SetOnlineButton.Name = "SetOnlineButton";
+            this.SetOnlineButton.Size = new System.Drawing.Size(66, 25);
+            this.SetOnlineButton.TabIndex = 12;
+            this.SetOnlineButton.TabStop = false;
+            this.SetOnlineButton.Text = "Set online";
+            this.SetOnlineButton.UseVisualStyleBackColor = true;
+            this.SetOnlineButton.Click += new System.EventHandler(this.SetOnlineButton_Click);
             // 
             // MainWindow
             // 
@@ -180,7 +197,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
             this.ClientSize = new System.Drawing.Size(540, 462);
-            this.Controls.Add(this.idleCounter);
+            this.Controls.Add(this.SetOnlineButton);
+            this.Controls.Add(this.SetInvisibleButton);
             this.Controls.Add(this.RemoveAppButton);
             this.Controls.Add(this.ClearLogButton);
             this.Controls.Add(this.AppCounter);
@@ -213,7 +231,8 @@
         private System.Windows.Forms.Label AppCounter;
         private System.Windows.Forms.Button ClearLogButton;
         private System.Windows.Forms.Button RemoveAppButton;
-        private System.Windows.Forms.Label idleCounter;
+        private System.Windows.Forms.Button SetInvisibleButton;
+        private System.Windows.Forms.Button SetOnlineButton;
     }
 }
 

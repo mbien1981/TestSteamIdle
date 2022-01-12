@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace TestSteamIdleGui
@@ -66,8 +67,6 @@ namespace TestSteamIdleGui
             for (int i = 0; i < AppList.Items.Count; i++)
             {
                 AppInfo app = (AppInfo)AppList.Items[i];
-                OutputText("saved " + app.ToString());
-
                 bool state = AppList.GetItemChecked(i);
 
                 data.Add(app.Id + "," + state.ToString());
@@ -91,7 +90,9 @@ namespace TestSteamIdleGui
                 string response = client.DownloadString(url);
                 try
                 {
-                    name = Regex.Match(response, ",\"name\":\"(.+?)\",").Groups[1].Value;
+                    Regex reg_exp = new Regex("[^ -~]+");
+                    // app name without unicode characters
+                    name = Regex.Match(reg_exp.Replace(response, ""), ",\"name\":\"(.+?)\",").Groups[1].Value;
                 }
                 catch
                 {
@@ -134,8 +135,8 @@ namespace TestSteamIdleGui
 
             foreach (AppInfo app in AppList.CheckedItems)
             {
-                //startInfo.Arguments = app.Id.ToString();
-                //Process.Start(startInfo);
+                startInfo.Arguments = app.Id.ToString();
+                Process.Start(startInfo);
 
                 OutputText("\t• Started idle process for app " + app.ToString());
                 PaintText(app.ToString(), 128, 255, 128);
@@ -144,12 +145,11 @@ namespace TestSteamIdleGui
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            if (AppList.CheckedItems.Count > 31)
+            if (Process.GetProcessesByName("steam").Length == 0)
             {
-                string error_msg = "App limit exceeded you cannot run more than 31 apps at once.";
+                string error_msg = "Your steam client is not running.";
                 OutputText(error_msg);
                 PaintText(error_msg, 255, 128, 128);
-
                 return;
             }
 
@@ -161,13 +161,17 @@ namespace TestSteamIdleGui
                 return;
             }
 
-            if (Process.GetProcessesByName("steam").Length == 0)
+            if (AppList.CheckedItems.Count > 31)
             {
-                string error_msg = "Your steam client is not running.";
+                string error_msg = "App limit exceeded you cannot run more than 31 apps at once.";
                 OutputText(error_msg);
                 PaintText(error_msg, 255, 128, 128);
+
                 return;
             }
+
+            if (AppList.CheckedItems.Count > 1)
+                SetSteamStatus("invisible");
 
             // stop any existing idle process
             StopIdle();
@@ -192,6 +196,10 @@ namespace TestSteamIdleGui
                 StopIdle();
 
                 OutputText("\nStopped existing idle process.");
+
+                Thread.Sleep(2500);
+                if (AppList.CheckedItems.Count > 1)
+                    SetSteamStatus("online");
             }
         }
 
@@ -233,7 +241,21 @@ namespace TestSteamIdleGui
         private void AppList_SelectedIndexChanged(object sender, EventArgs e) => SaveAppList();
 
         private void ClearLogButton_Click(object sender, EventArgs e) => OutputBox.Clear();
+
+        // update steam status
+        void SetSteamStatus(string status)
+        {
+            Process.Start("steam://friends/status/" + status);
+            OutputText("Steam status set to " + status + ".");
+            PaintText(status, 255, 255, 128);
+        }
+
+        private void SetInvisibleButton_Click(object sender, EventArgs e) => SetSteamStatus("invisible");
+        
+
+        private void SetOnlineButton_Click(object sender, EventArgs e) => SetSteamStatus("online");
     }
+
     public class AppInfo
     {
         public int Id { get; set; }
