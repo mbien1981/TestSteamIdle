@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.StartButton = new System.Windows.Forms.Button();
             this.OutputBox = new System.Windows.Forms.RichTextBox();
             this.AppList = new System.Windows.Forms.CheckedListBox();
@@ -40,6 +42,12 @@
             this.RemoveAppButton = new System.Windows.Forms.Button();
             this.SetInvisibleButton = new System.Windows.Forms.Button();
             this.SetOnlineButton = new System.Windows.Forms.Button();
+            this.SaveButton = new System.Windows.Forms.Button();
+            this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.maximizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // StartButton
@@ -62,7 +70,7 @@
             this.OutputBox.Location = new System.Drawing.Point(13, 89);
             this.OutputBox.Name = "OutputBox";
             this.OutputBox.ReadOnly = true;
-            this.OutputBox.Size = new System.Drawing.Size(256, 330);
+            this.OutputBox.Size = new System.Drawing.Size(256, 333);
             this.OutputBox.TabIndex = 0;
             this.OutputBox.TabStop = false;
             this.OutputBox.Text = "";
@@ -74,11 +82,13 @@
             this.AppList.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AppList.ForeColor = System.Drawing.Color.Silver;
             this.AppList.FormattingEnabled = true;
+            this.AppList.HorizontalScrollbar = true;
             this.AppList.Location = new System.Drawing.Point(275, 89);
             this.AppList.Name = "AppList";
-            this.AppList.Size = new System.Drawing.Size(254, 292);
+            this.AppList.Size = new System.Drawing.Size(254, 308);
             this.AppList.TabIndex = 2;
             this.AppList.TabStop = false;
+            this.AppList.SelectedIndexChanged += new System.EventHandler(this.AppList_SelectedIndexChanged);
             // 
             // StopButton
             // 
@@ -98,7 +108,7 @@
             // 
             this.InputField.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.InputField.ForeColor = System.Drawing.Color.Silver;
-            this.InputField.Location = new System.Drawing.Point(275, 399);
+            this.InputField.Location = new System.Drawing.Point(275, 402);
             this.InputField.MinimumSize = new System.Drawing.Size(4, 20);
             this.InputField.Name = "InputField";
             this.InputField.Size = new System.Drawing.Size(254, 20);
@@ -110,7 +120,7 @@
             // 
             this.AddAppButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AddAppButton.ForeColor = System.Drawing.Color.Silver;
-            this.AddAppButton.Location = new System.Drawing.Point(275, 425);
+            this.AddAppButton.Location = new System.Drawing.Point(275, 428);
             this.AddAppButton.Name = "AddAppButton";
             this.AddAppButton.Size = new System.Drawing.Size(122, 25);
             this.AddAppButton.TabIndex = 5;
@@ -143,7 +153,7 @@
             // 
             this.ClearLogButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ClearLogButton.ForeColor = System.Drawing.Color.Silver;
-            this.ClearLogButton.Location = new System.Drawing.Point(13, 425);
+            this.ClearLogButton.Location = new System.Drawing.Point(13, 428);
             this.ClearLogButton.Name = "ClearLogButton";
             this.ClearLogButton.Size = new System.Drawing.Size(66, 25);
             this.ClearLogButton.TabIndex = 8;
@@ -156,7 +166,7 @@
             // 
             this.RemoveAppButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RemoveAppButton.ForeColor = System.Drawing.Color.Silver;
-            this.RemoveAppButton.Location = new System.Drawing.Point(407, 425);
+            this.RemoveAppButton.Location = new System.Drawing.Point(407, 428);
             this.RemoveAppButton.Name = "RemoveAppButton";
             this.RemoveAppButton.Size = new System.Drawing.Size(121, 25);
             this.RemoveAppButton.TabIndex = 9;
@@ -169,7 +179,7 @@
             // 
             this.SetInvisibleButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SetInvisibleButton.ForeColor = System.Drawing.Color.Silver;
-            this.SetInvisibleButton.Location = new System.Drawing.Point(85, 425);
+            this.SetInvisibleButton.Location = new System.Drawing.Point(85, 428);
             this.SetInvisibleButton.Name = "SetInvisibleButton";
             this.SetInvisibleButton.Size = new System.Drawing.Size(112, 25);
             this.SetInvisibleButton.TabIndex = 11;
@@ -182,7 +192,7 @@
             // 
             this.SetOnlineButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SetOnlineButton.ForeColor = System.Drawing.Color.Silver;
-            this.SetOnlineButton.Location = new System.Drawing.Point(203, 425);
+            this.SetOnlineButton.Location = new System.Drawing.Point(203, 428);
             this.SetOnlineButton.Name = "SetOnlineButton";
             this.SetOnlineButton.Size = new System.Drawing.Size(66, 25);
             this.SetOnlineButton.TabIndex = 12;
@@ -191,12 +201,56 @@
             this.SetOnlineButton.UseVisualStyleBackColor = true;
             this.SetOnlineButton.Click += new System.EventHandler(this.SetOnlineButton_Click);
             // 
+            // SaveButton
+            // 
+            this.SaveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SaveButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SaveButton.ForeColor = System.Drawing.Color.Silver;
+            this.SaveButton.Location = new System.Drawing.Point(485, 372);
+            this.SaveButton.Name = "SaveButton";
+            this.SaveButton.Size = new System.Drawing.Size(43, 25);
+            this.SaveButton.TabIndex = 13;
+            this.SaveButton.TabStop = false;
+            this.SaveButton.Text = "Save";
+            this.SaveButton.UseVisualStyleBackColor = true;
+            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
+            // 
+            // NotifyIcon
+            // 
+            this.NotifyIcon.ContextMenuStrip = this.contextMenu;
+            this.NotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyIcon.Icon")));
+            this.NotifyIcon.Text = "TestSteamIdle";
+            this.NotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon_MouseDoubleClick);
+            // 
+            // contextMenu
+            // 
+            this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.maximizeToolStripMenuItem,
+            this.exitToolStripMenuItem});
+            this.contextMenu.Name = "contextMenu";
+            this.contextMenu.Size = new System.Drawing.Size(126, 48);
+            // 
+            // maximizeToolStripMenuItem
+            // 
+            this.maximizeToolStripMenuItem.Name = "maximizeToolStripMenuItem";
+            this.maximizeToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.maximizeToolStripMenuItem.Text = "Maximize";
+            this.maximizeToolStripMenuItem.Click += new System.EventHandler(this.maximizeToolStripMenuItem_Click);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
-            this.ClientSize = new System.Drawing.Size(540, 462);
+            this.ClientSize = new System.Drawing.Size(540, 465);
+            this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.SetOnlineButton);
             this.Controls.Add(this.SetInvisibleButton);
             this.Controls.Add(this.RemoveAppButton);
@@ -210,10 +264,13 @@
             this.Controls.Add(this.OutputBox);
             this.Controls.Add(this.StartButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.Text = "TestSteamIdle";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.Load += new System.EventHandler(this.MainWindow_Load);
+            this.contextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -233,6 +290,11 @@
         private System.Windows.Forms.Button RemoveAppButton;
         private System.Windows.Forms.Button SetInvisibleButton;
         private System.Windows.Forms.Button SetOnlineButton;
+        private System.Windows.Forms.Button SaveButton;
+        private System.Windows.Forms.NotifyIcon NotifyIcon;
+        private System.Windows.Forms.ContextMenuStrip contextMenu;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem maximizeToolStripMenuItem;
     }
 }
 

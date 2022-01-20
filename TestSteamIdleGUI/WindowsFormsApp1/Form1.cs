@@ -5,6 +5,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -13,12 +15,17 @@ namespace TestSteamIdleGui
 {
     public partial class MainWindow : Form
     {
-        static readonly string AppIdsTxt = "apps.txt";
+        static readonly string ResourceFolder = "Resources/";
+        static readonly string CacheFolder = "apps/";
+        static readonly string CacheExt = ".cache";
         static readonly string IdleExeName = "TestSteamIdle";
         static readonly string IdleExe = IdleExeName + ".exe";
+        static readonly string IcoName = IdleExeName + ".ico";
 
         static readonly string path = AppDomain.CurrentDomain.BaseDirectory;
-        static readonly string pathTxt = Path.Combine(path, AppIdsTxt);
+        static readonly string pathCache = Path.Combine(path, CacheFolder);
+        static readonly string pathResources = Path.Combine(path, ResourceFolder);
+        static readonly string pathIco = Path.Combine(pathResources, IcoName);
         static readonly string pathExe = Path.Combine(path, IdleExe);
         readonly ProcessStartInfo startInfo = new ProcessStartInfo(pathExe);
 
@@ -39,73 +46,93 @@ namespace TestSteamIdleGui
         }
 
         // apps.txt
-        void LoadAppList()
+        public void SaveAppList()
         {
-            SortedDictionary<int, bool> apps = new SortedDictionary<int, bool>();
-
-            foreach (string line in File.ReadLines(pathTxt))
+            for (int i = 0; i < AppList.Items.Count; i++)
             {
-                List<string> data = line.Split(',').ToList();
-                if (data.Count > 0)
-                    apps.Add(int.Parse(data[0]), bool.Parse(data[1]));
+                AppInfo app = (AppInfo)AppList.Items[i];
+
+                string filepath = pathCache + app.Id.ToString() + CacheExt;
+                if (File.Exists(filepath))
+                    File.Delete(filepath);
+
+                var stream = File.Create(filepath);
+
+                bool state = AppList.GetItemChecked(i);
+
+                new BinaryFormatter().Serialize(stream, new AppInfo(app.Id, state, app.Name));
+                stream.Close();
+            }
+        }
+
+        public void LoadAppList()
+        {
+            SortedDictionary<string, AppInfo> apps = new SortedDictionary<string, AppInfo>();
+
+            string[] CacheFiles = Directory.GetFiles(pathCache);
+            foreach (string filepath in CacheFiles)
+            {
+                var stream = File.OpenRead(filepath);
+                var app = (AppInfo)new BinaryFormatter().Deserialize(stream);
+                stream.Close();
+
+                apps.Add(app.Name, app);
             }
 
-            foreach (KeyValuePair<int, bool> kvp in apps)
+            foreach (KeyValuePair<string, AppInfo> item in apps)
             {
-                AppInfo app = new AppInfo(kvp.Key, GetAppName(kvp.Key));
-
-                AppList.Items.Add(app, kvp.Value);
+                AppList.Items.Add(item.Value, item.Value.State);
             }
 
             AppCounter.Text = "Apps: " + AppList.Items.Count;
         }
 
-        private void SaveAppList()
-        {
-            List<string> data = new List<string>();
-
-            for (int i = 0; i < AppList.Items.Count; i++)
-            {
-                AppInfo app = (AppInfo)AppList.Items[i];
-                bool state = AppList.GetItemChecked(i);
-
-                data.Add(app.Id + "," + state.ToString());
-            }
-
-            System.IO.File.WriteAllLines("apps.txt", data);
-        }
-
-        private static string GetAppName(int appid)
+        private string GetAppName(int appid)
         {
             // Ignore exception: Can not create SSL/TLS secure channel
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             //
+            
+            Regex reg_exp = new Regex("[^ -~]+");
 
-            string name = "<unknown>";
+            string name = string.Empty;
             string url = "https://store.steampowered.com/api/appdetails?filters=basic&appids=" + appid.ToString();
             using (WebClient client = new WebClient())
             {
                 string response = client.DownloadString(url);
                 try
                 {
-                    Regex reg_exp = new Regex("[^ -~]+");
-                    // app name without unicode characters
                     name = Regex.Match(reg_exp.Replace(response, ""), ",\"name\":\"(.+?)\",").Groups[1].Value;
                 }
                 catch
                 {
                 }
+
             }
-            return name;
+
+            return name != "" ? name : appid.ToString() + " | <unknown>";
+        }
+
+        // dark title bar - https://stackoverflow.com/a/64927217
+        [DllImport("DwmApi")]
+        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            if (DwmSetWindowAttribute(Handle, 19, new[] { 1 }, 4) != 0)
+                DwmSetWindowAttribute(Handle, 20, new[] { 1 }, 4);
         }
 
         // init
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            if (!File.Exists(pathTxt))
-                File.Create(pathTxt).Close();
+            OnHandleCreated(e);
+
+            NotifyIcon.Visible = false;
+
+            Directory.CreateDirectory(CacheFolder);
 
             LoadAppList();
 
@@ -113,13 +140,13 @@ namespace TestSteamIdleGui
 
             if (Process.GetProcessesByName("steam").Length == 0)
             {
-                string error_msg = "Your steam client is not running.";
+                string error_msg = "Your steam client is not running.\n";
                 OutputText(error_msg);
                 PaintText(error_msg, 255, 128, 128);
                 return;
             }
 
-            string success_msg = "Steam client is running.";
+            string success_msg = "Steam client is running.\n";
             OutputText(success_msg);
             PaintText(success_msg, 128, 255, 128);
 
@@ -131,14 +158,14 @@ namespace TestSteamIdleGui
         // start idle button
         void StartIdle()
         {
-            OutputText("\nStarting Idle...");
+            OutputText("\nThe following apps have been set to idle:");
 
             foreach (AppInfo app in AppList.CheckedItems)
             {
                 startInfo.Arguments = app.Id.ToString();
                 Process.Start(startInfo);
 
-                OutputText("\t• Started idle process for app " + app.ToString());
+                OutputText("\t• " + app.ToString());
                 PaintText(app.ToString(), 128, 255, 128);
             }
         }
@@ -179,6 +206,7 @@ namespace TestSteamIdleGui
             StartIdle();
 
             string total_apps = AppList.CheckedItems.Count.ToString();
+
             OutputText("\nIdling " + total_apps + " app(s).");
         }
 
@@ -196,10 +224,6 @@ namespace TestSteamIdleGui
                 StopIdle();
 
                 OutputText("\nStopped existing idle process.");
-
-                Thread.Sleep(2500);
-                if (AppList.CheckedItems.Count > 1)
-                    SetSteamStatus("online");
             }
         }
 
@@ -215,8 +239,10 @@ namespace TestSteamIdleGui
             if (InputField.Text == "")
                 return;
 
-            AppInfo app = new AppInfo(int.Parse(InputField.Text), GetAppName(int.Parse(InputField.Text)));
-            AppList.Items.Add(app, true);
+            int id = int.Parse(InputField.Text);
+            
+            AppInfo app = new AppInfo(id, true, GetAppName(id));
+            AppList.Items.Add(app, app.State);
 
             OutputText("Added app " + app.Name);
             PaintText(app.Name, 128, 255, 128);
@@ -234,11 +260,21 @@ namespace TestSteamIdleGui
             if (AppList.SelectedItem == null)
                 return;
 
+            AppInfo app = (AppInfo)AppList.SelectedItem;
+
+            string filepath = pathCache + app.Id.ToString() + CacheExt;
+            if (File.Exists(filepath))
+                File.Delete(filepath);
+
             AppList.Items.Remove(AppList.SelectedItem);
+
+            string app_msg =  app.Id.ToString() + " | " + app.Name;
+            OutputText("Removed app: " + app_msg);
+            PaintText(app_msg, 255, 128, 128);
+
+
             SaveAppList();
         }
-
-        private void AppList_SelectedIndexChanged(object sender, EventArgs e) => SaveAppList();
 
         private void ClearLogButton_Click(object sender, EventArgs e) => OutputBox.Clear();
 
@@ -251,20 +287,58 @@ namespace TestSteamIdleGui
         }
 
         private void SetInvisibleButton_Click(object sender, EventArgs e) => SetSteamStatus("invisible");
-        
 
         private void SetOnlineButton_Click(object sender, EventArgs e) => SetSteamStatus("online");
+
+        private void AppList_SelectedIndexChanged(object sender, EventArgs e) => SaveAppList();
+
+        private void SaveButton_Click(object sender, EventArgs e) => SaveAppList();
+
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                NotifyIcon.Visible = true;
+                this.Hide();
+                e.Cancel = true;
+            }
+        }
+
+
+        private void MaximizeWindow()
+        {
+            NotifyIcon.Visible = false;
+            this.Show();
+        }
+
+        // icon tray
+        private void NotifyIcon_MouseDoubleClick(object sender, MouseEventArgs e) => MaximizeWindow();
+
+        // context menu
+        private void maximizeToolStripMenuItem_Click(object sender, EventArgs e) => MaximizeWindow();
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NotifyIcon.Visible = false;
+            Application.Exit();
+        }
+
     }
 
+    [Serializable]
     public class AppInfo
     {
         public int Id { get; set; }
+        public bool State { get; set; }
         public string Name { get; set; }
-        public AppInfo(int id, string name = "<unknown>")
+
+        public AppInfo(int id, bool state = true, string name = "<unknown>")
         {
             this.Id = id;
+            this.State = state;
             this.Name = name;
         }
+
         public override string ToString() => Name.ToString();
     }
 }
